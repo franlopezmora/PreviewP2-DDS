@@ -7,10 +7,6 @@ yarn-error.log
 dist/
 coverage/
 
-# SQLite
-*.sqlite
-*.sqlite3
-
 # Mac / Linux / Windows
 .DS_Store
 Thumbs.db
