@@ -1,0 +1,32 @@
+# Node
+node_modules/
+.env
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+dist/
+coverage/
+
+# SQLite
+*.sqlite
+*.sqlite3
+
+# Mac / Linux / Windows
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+logs
+*.log
+
+# React (Vite)
+client/dist/
+client/node_modules/
+client/.vite/
+
+# Build
+build/
