@@ -1,8 +1,17 @@
 import express from 'express';
 import sequelize from './db.js';
+import partidasRouter from './routes/partidas.routes.js';
+import juegosRouter from './routes/juegos.routes.js';
+import cors from 'cors';
+
 
 const app = express();
 const PORT = 3000;
+
+app.use(cors());
+app.use(express.json());
+app.use('/api/partidas', partidasRouter);
+app.use('/api/juegos', juegosRouter);
 
 // Ruta principal de servidor
 app.get("/", (req, res) => {
