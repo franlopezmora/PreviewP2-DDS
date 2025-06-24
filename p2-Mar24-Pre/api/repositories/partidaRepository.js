@@ -21,6 +21,9 @@ const obtenerTodas = async (filtros = {}) => {
       [Op.lte]: filtros.FECHA_LIMITE
     };
   }
+  console.log('Filtros recibidos:', filtros);
+
+  const limite = filtros.inicio === 'true' ? 10 : 25;
 
   return await Partida.findAll({
     where,
@@ -29,9 +32,10 @@ const obtenerTodas = async (filtros = {}) => {
       as: 'juego'
     },
     order: [['FECHA', 'DESC']],
-    limit: 25
+    limit: limite
   });
 };
+
 
 const obtenerPorId = async (id) => {
   return await Partida.findByPk(id, {

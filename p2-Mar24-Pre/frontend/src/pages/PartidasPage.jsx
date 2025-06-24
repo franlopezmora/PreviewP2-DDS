@@ -24,6 +24,19 @@ function PartidasPage() {
     setJuegos(datos);
   };
 
+
+  const cargarPartidasIniciales = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/api/partidas?inicio=true');
+
+    const data = await response.json();
+    setPartidas(data);
+  } catch (error) {
+    console.error('Error al cargar las partidas iniciales', error);
+  }
+};
+
+
   const handleEliminar = async (id) => {
     if (!confirm('¿Eliminar partida?')) return;
     await eliminarPartida(id);
@@ -46,8 +59,9 @@ function PartidasPage() {
 
   useEffect(() => {
     cargarJuegos();
-    cargarPartidas();
-  }, [cargarPartidas]);
+    cargarPartidasIniciales();
+  }, []);
+
 
 
   return (
@@ -123,8 +137,11 @@ function PartidasPage() {
                       <div className="mt-2 border rounded p-2 bg-light">
                         <div className="d-flex align-items-start">
                           <img
-                            src={p.juego?.URL_IMAGEN || ''}
-                            onError={(e) => (e.target.src = 'https://via.placeholder.com/100x150?text=Sin+imagen')}
+                            src={p.juego?.URL_IMAGEN || 'https://placehold.co/100x150?text=Sin+imagen'}
+                            onError={(e) => {
+                              e.target.onerror = null; // prevenir loop
+                              e.target.src = 'https://placehold.co/100x150?text=Sin+imagen';
+                            }}
                             alt="portada"
                             style={{ width: 100, height: 150, objectFit: 'cover', marginRight: '1rem' }}
                           />

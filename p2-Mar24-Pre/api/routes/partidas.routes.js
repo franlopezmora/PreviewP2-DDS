@@ -8,7 +8,8 @@ router.get('/', async (req, res) => {
   try {
     const filtros = {
       ID_JUEGO: req.query.ID_JUEGO,
-      FECHA_LIMITE: req.query.FECHA_LIMITE
+      FECHA_LIMITE: req.query.FECHA_LIMITE,      
+      inicio: req.query.inicio // Asegurate de que esto se pase
     };
     const partidas = await partidaService.listar(filtros);
     res.json(partidas);
