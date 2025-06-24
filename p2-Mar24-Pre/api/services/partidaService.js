@@ -24,6 +24,15 @@ const validarDatos = async (datos) => {
     errores.push("Debe haber al menos 2 jugadores.");
   }
 
+  if (datos.puntosObtenidos === undefined || isNaN(datos.puntosObtenidos) || 
+      datos.puntosObtenidos < 0 || datos.puntosObtenidos > 100) {
+    errores.push("Los puntos obtenidos deben ser un número entre 0 y 100.");
+  }
+
+  if (typeof datos.esCooperativa !== "boolean") {
+    errores.push("Debe especificar si la partida fue cooperativa (true/false).");
+  }
+
   const juego = await Juego.findByPk(datos.ID_JUEGO);
   if (!juego) {
     errores.push("El juego seleccionado no existe.");

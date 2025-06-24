@@ -26,6 +26,16 @@ export default (sequelize, DataTypes) => {
     GANADOR: {
       type: DataTypes.TEXT,
       allowNull: false
+    },
+    puntosObtenidos: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'PUNTOS_OBTENIDOS'
+    },
+    esCooperativa: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      field: 'ES_COOPERATIVA'
     }
   }, {
     tableName: 'PARTIDAS',

@@ -9,14 +9,18 @@ router.get('/', async (req, res) => {
     const filtros = {
       ID_JUEGO: req.query.ID_JUEGO,
       FECHA_LIMITE: req.query.FECHA_LIMITE,      
-      inicio: req.query.inicio // Asegurate de que esto se pase
+      inicio: req.query.inicio,
+      esCooperativa: req.query.esCooperativa,
+      puntosMinimos: req.query.puntosMinimos
     };
     const partidas = await partidaService.listar(filtros);
     res.json(partidas);
   } catch (err) {
+    console.error('Error en GET /api/partidas:', err); // 👈 AGREGÁ ESTA LÍNEA
     res.status(500).json({ error: 'Error al obtener partidas' });
   }
 });
+
 
 // Obtener partida por ID
 router.get('/:id', async (req, res) => {

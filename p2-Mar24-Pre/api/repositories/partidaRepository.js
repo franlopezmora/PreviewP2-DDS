@@ -21,7 +21,18 @@ const obtenerTodas = async (filtros = {}) => {
       [Op.lte]: filtros.FECHA_LIMITE
     };
   }
-  console.log('Filtros recibidos:', filtros);
+
+  if (filtros.puntosMinimos !== undefined && filtros.puntosMinimos !== '') {
+    where.puntosObtenidos = { [Op.gte]: parseInt(filtros.puntosMinimos) };
+  }
+
+  if (filtros.esCooperativa === 'true') {
+    where['ES_COOPERATIVA'] = true;
+  } else if (filtros.esCooperativa === 'false') {
+    where['ES_COOPERATIVA'] = false;
+  }
+
+
 
   const limite = filtros.inicio === 'true' ? 10 : 25;
 
@@ -35,6 +46,7 @@ const obtenerTodas = async (filtros = {}) => {
     limit: limite
   });
 };
+
 
 
 const obtenerPorId = async (id) => {

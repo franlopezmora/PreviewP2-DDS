@@ -11,7 +11,9 @@ function PartidaForm({ idPartida }) {
     ID_JUEGO: '',
     FECHA: '',
     JUGADORES: '',
-    GANADOR: ''
+    GANADOR: '',
+    puntosObtenidos: 0,
+    esCooperativa: false
   });
   const [juegos, setJuegos] = useState([]);
   const [errores, setErrores] = useState({});
@@ -27,7 +29,9 @@ function PartidaForm({ idPartida }) {
           ID_JUEGO: data.ID_JUEGO,
           FECHA: data.FECHA,
           JUGADORES: data.JUGADORES,
-          GANADOR: data.GANADOR
+          GANADOR: data.GANADOR,
+          puntosObtenidos: data.puntosObtenidos ?? 0,
+          esCooperativa: data.esCooperativa ?? false
         });
       }
     };
@@ -45,6 +49,9 @@ function PartidaForm({ idPartida }) {
     if (!formData.FECHA) errs.FECHA = 'Debe ingresar una fecha';
     if (!formData.JUGADORES || formData.JUGADORES < 2) errs.JUGADORES = 'Mínimo 2 jugadores';
     if (!formData.GANADOR) errs.GANADOR = 'Debe ingresar un nombre de ganador';
+    if (formData.puntosObtenidos < 0 || formData.puntosObtenidos > 100) {
+      errs.puntosObtenidos = 'Debe estar entre 0 y 100';
+    }
     setErrores(errs);
     return Object.keys(errs).length === 0;
   };
@@ -124,6 +131,38 @@ function PartidaForm({ idPartida }) {
         />
         {errores.GANADOR && <div className="text-danger">{errores.GANADOR}</div>}
       </div>
+
+      <div className="mb-3">
+        <label className="form-label">Puntos obtenidos (0–100)</label>
+        <input
+          type="number"
+          className="form-control"
+          name="puntosObtenidos"
+          value={formData.puntosObtenidos}
+          onChange={handleChange}
+          min={0}
+          max={100}
+          required
+        />
+      </div>
+
+      <div className="form-check mb-3">
+        <input
+          className="form-check-input"
+          type="checkbox"
+          name="esCooperativa"
+          id="esCooperativa"
+          checked={formData.esCooperativa}
+          onChange={(e) =>
+            setFormData({ ...formData, esCooperativa: e.target.checked })
+          }
+        />
+        <label className="form-check-label" htmlFor="esCooperativa">
+          ¿Es cooperativa?
+        </label>
+      </div>
+
+
 
       <button className="btn btn-primary">
         {idPartida ? 'Guardar Cambios' : 'Registrar Partida'}

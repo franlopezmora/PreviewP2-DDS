@@ -7,7 +7,12 @@ import { Link } from 'react-router-dom';
 function PartidasPage() {
   const [partidas, setPartidas] = useState([]);
   const [juegos, setJuegos] = useState([]);
-  const [filtros, setFiltros] = useState({ ID_JUEGO: '', FECHA_LIMITE: '' });
+  const [filtros, setFiltros] = useState({
+    ID_JUEGO: '',
+    FECHA_LIMITE: '',
+    esCooperativa: '',
+    puntosMinimos: ''
+  });
   const [juegoActivo, setJuegoActivo] = useState(null);
 
 
@@ -23,17 +28,31 @@ function PartidasPage() {
     setJuegos(datos);
   };
 
+  const estrellasDesdePuntos = (puntos) => {
+    if (puntos >= 80) return '⭐ ⭐ ⭐ ⭐ ⭐';
+    if (puntos >= 60) return '⭐ ⭐ ⭐ ⭐';
+    if (puntos >= 40) return '⭐ ⭐ ⭐';
+    if (puntos >= 20) return '⭐ ⭐';
+    return '⭐';
+  };
 
   const cargarPartidasIniciales = async () => {
-  try {
-    const response = await fetch('http://localhost:3000/api/partidas?inicio=true');
+    try {
+      const response = await fetch('http://localhost:3000/api/partidas?inicio=true');
+      const data = await response.json();
 
-    const data = await response.json();
-    setPartidas(data);
-  } catch (error) {
-    console.error('Error al cargar las partidas iniciales', error);
-  }
-};
+      if (Array.isArray(data)) {
+        setPartidas(data);
+      } else {
+        console.error('La respuesta no es un array:', data);
+        setPartidas([]);
+      }
+    } catch (error) {
+      console.error('Error al cargar las partidas iniciales', error);
+      setPartidas([]);
+    }
+  };
+
 
 
   const handleEliminar = async (id) => {
@@ -99,6 +118,35 @@ function PartidasPage() {
               <div className="col-md-3 d-flex align-items-end">
                 <button className="btn btn-primary w-100">Filtrar</button>
               </div>
+
+              <div className="col-md-4">
+                <label className="form-label">¿Es cooperativa?</label>
+                <select
+                  className="form-select w-100"
+                  name="esCooperativa"
+                  value={filtros.esCooperativa}
+                  onChange={handleChange}
+                >
+                  <option value="">-- Todas --</option>
+                  <option value="true">Sí</option>
+                  <option value="false">No</option>
+                </select>
+              </div>
+
+              <div className="col-md-4">
+                <label className="form-label">Puntos mínimos</label>
+                <input
+                  type="number"
+                  className="form-control w-100"
+                  name="puntosMinimos"
+                  value={filtros.puntosMinimos}
+                  onChange={handleChange}
+                  min={0}
+                  max={100}
+                />
+              </div>
+
+
             </form>
 
             <div className="table-responsive">
@@ -110,6 +158,8 @@ function PartidasPage() {
                     <th>Fecha</th>
                     <th>Jugadores</th>
                     <th>Ganador</th>
+                    <th>Puntos ⭐</th>
+                    <th>Modo 🧩</th>  
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -150,6 +200,11 @@ function PartidasPage() {
                       <td>{p.FECHA}</td>
                       <td>{p.JUGADORES}</td>
                       <td>{p.GANADOR}</td>
+                      <td>{estrellasDesdePuntos(p.puntosObtenidos)}</td>
+                      <td className="text-center">
+                        {p.esCooperativa ? '🤝' : '⚔️'}
+                      </td>
+
                       <td>
                         <div className="d-flex gap-2">
                           <Link to={`/editar/${p.ID_PARTIDA}`} className="btn btn-sm btn-primary">
