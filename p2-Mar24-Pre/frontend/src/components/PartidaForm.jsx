@@ -1,8 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { crearPartida, actualizarPartida } from '../services/partidaService';
 import { obtenerJuegos } from '../services/juegoService';
+import { obtenerPartidaPorId } from '../services/partidaService';
 
-function PartidaForm({ partida = null, modo = 'crear', onSuccess }) {
+
+function PartidaForm({ idPartida }) {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     ID_JUEGO: '',
     FECHA: '',
@@ -10,103 +14,120 @@ function PartidaForm({ partida = null, modo = 'crear', onSuccess }) {
     GANADOR: ''
   });
   const [juegos, setJuegos] = useState([]);
-  const [errores, setErrores] = useState([]);
+  const [errores, setErrores] = useState({});
 
   useEffect(() => {
-    const cargarJuegos = async () => {
-      const data = await obtenerJuegos();
-      setJuegos(data);
+    const cargarDatos = async () => {
+      const juegos = await obtenerJuegos();
+      setJuegos(juegos);
+
+      if (idPartida) {
+        const data = await obtenerPartidaPorId(idPartida);
+        setFormData({
+          ID_JUEGO: data.ID_JUEGO,
+          FECHA: data.FECHA,
+          JUGADORES: data.JUGADORES,
+          GANADOR: data.GANADOR
+        });
+      }
     };
-    cargarJuegos();
-  }, []);
+    cargarDatos();
+  }, [idPartida]);
 
-  useEffect(() => {
-    if (partida) {
-      setFormData({
-        ID_JUEGO: partida.ID_JUEGO,
-        FECHA: partida.FECHA,
-        JUGADORES: partida.JUGADORES,
-        GANADOR: partida.GANADOR
-      });
-    }
-  }, [partida]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const validar = () => {
+    const errs = {};
+    if (!formData.ID_JUEGO) errs.ID_JUEGO = 'Debe seleccionar un juego';
+    if (!formData.FECHA) errs.FECHA = 'Debe ingresar una fecha';
+    if (!formData.JUGADORES || formData.JUGADORES < 2) errs.JUGADORES = 'Mínimo 2 jugadores';
+    if (!formData.GANADOR) errs.GANADOR = 'Debe ingresar un nombre de ganador';
+    setErrores(errs);
+    return Object.keys(errs).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrores([]);
+    if (!validar()) return;
 
-    try {
-      let resultado;
-
-      if (modo === 'editar') {
-        resultado = await actualizarPartida(partida.ID_PARTIDA, formData);
-      } else {
-        resultado = await crearPartida(formData);
-      }
-
-      if (resultado.errores) {
-        setErrores(resultado.errores);
-      } else {
-        onSuccess();
-        if (modo === 'crear') {
-          setFormData({ ID_JUEGO: '', FECHA: '', JUGADORES: '', GANADOR: '' });
-        }
-      }
-    } catch {
-      setErrores(['Error al guardar partida']);
+    if (idPartida) {
+      await actualizarPartida(idPartida, formData);
+    } else {
+      await crearPartida(formData);
     }
+
+    navigate('/');
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4">
-      <h4>{modo === 'editar' ? '✏️ Editar partida' : '➕ Registrar nueva partida'}</h4>
+    <form onSubmit={handleSubmit} className="card p-4 shadow-sm">
+      <h3 className="mb-2">{idPartida ? 'Editar' : 'Nueva'} Partida</h3>
 
-      {errores.length > 0 && (
-        <div className="alert alert-danger">
-          <ul className="mb-0">
-            {errores.map((err, i) => (
-              <li key={i}>{err}</li>
-            ))}
-          </ul>
-        </div>
+      { idPartida && (
+        <p className="text-muted mb-3">ID de partida: <strong>{idPartida}</strong></p>
       )}
 
-      <div className="row g-3">
-        <div className="col-md-5">
-          <label className="form-label">Juego</label>
-          <select className="form-select" name="ID_JUEGO" value={formData.ID_JUEGO} onChange={handleChange} required>
-            <option value="">-- Seleccionar --</option>
-            {juegos.map((j) => (
-              <option key={j.ID_JUEGO} value={j.ID_JUEGO}>
-                {j.NOMBRE}
-              </option>
-            ))}
-          </select>
-        </div>
 
-        <div className="col-md-4">
-          <label className="form-label">Fecha</label>
-          <input type="date" className="form-control" name="FECHA" value={formData.FECHA} onChange={handleChange} required />
-        </div>
-
-        <div className="col-md-2">
-          <label className="form-label">Jugadores</label>
-          <input type="number" className="form-control" name="JUGADORES" value={formData.JUGADORES} onChange={handleChange} required min={2} />
-        </div>
-
-        <div className="col-md-6">
-          <label className="form-label">Ganador</label>
-          <input type="text" className="form-control" name="GANADOR" value={formData.GANADOR} onChange={handleChange} required />
-        </div>
-
-        <div className="col-md-6 d-flex align-items-end">
-          <button className="btn btn-success w-100">Guardar</button>
-        </div>
+      <div className="mb-3">
+        <label className="form-label">Juego</label>
+        <select
+          className="form-select"
+          name="ID_JUEGO"
+          value={formData.ID_JUEGO}
+          onChange={handleChange}
+        >
+          <option value="">-- Seleccionar --</option>
+          {juegos.map((j) => (
+            <option key={j.ID_JUEGO} value={j.ID_JUEGO}>
+              {j.NOMBRE}
+            </option>
+          ))}
+        </select>
+        {errores.ID_JUEGO && <div className="text-danger">{errores.ID_JUEGO}</div>}
       </div>
+
+      <div className="mb-3">
+        <label className="form-label">Fecha</label>
+        <input
+          type="date"
+          className="form-control"
+          name="FECHA"
+          value={formData.FECHA}
+          onChange={handleChange}
+        />
+        {errores.FECHA && <div className="text-danger">{errores.FECHA}</div>}
+      </div>
+
+      <div className="mb-3">
+        <label className="form-label">Cantidad de jugadores</label>
+        <input
+          type="number"
+          className="form-control"
+          name="JUGADORES"
+          value={formData.JUGADORES}
+          onChange={handleChange}
+        />
+        {errores.JUGADORES && <div className="text-danger">{errores.JUGADORES}</div>}
+      </div>
+
+      <div className="mb-3">
+        <label className="form-label">Ganador</label>
+        <input
+          type="text"
+          className="form-control"
+          name="GANADOR"
+          value={formData.GANADOR}
+          onChange={handleChange}
+        />
+        {errores.GANADOR && <div className="text-danger">{errores.GANADOR}</div>}
+      </div>
+
+      <button className="btn btn-primary">
+        {idPartida ? 'Guardar Cambios' : 'Registrar Partida'}
+      </button>
     </form>
   );
 }
