@@ -84,7 +84,7 @@ function PartidasPage() {
             
 
 
-          <div className="card shadow p-4">
+          <div className="panel">
             <h2 className="mb-4">
               📋 <strong>Partidas Jugadas</strong>
             </h2>
@@ -116,7 +116,7 @@ function PartidasPage() {
                 />
               </div>
               <div className="col-md-3 d-flex align-items-end">
-                <button className="btn btn-primary w-100">Filtrar</button>
+                <button className="btn btn-primary w-100 ">Filtrar</button>
               </div>
 
               <div className="col-md-4">
@@ -150,7 +150,7 @@ function PartidasPage() {
             </form>
 
             <div className="table-responsive">
-              <table className="table table-bordered table-striped">
+              <table className="table align-middle">
                 <thead className="table-dark">
                   <tr>
                     <th>ID</th> 
@@ -176,7 +176,7 @@ function PartidasPage() {
                         </button>
 
                         {juegoActivo === p.ID_PARTIDA && (
-                          <div className="mt-2 border rounded p-2 bg-light">
+                          <div className="bg-body-secondary bg-opacity-10 rounded-3 p-3 border border-secondary">
                             <div className="d-flex align-items-start">
                               <img
                                 src={p.juego?.URL_IMAGEN || 'https://placehold.co/100x150?text=Sin+imagen'}
@@ -207,10 +207,10 @@ function PartidasPage() {
 
                       <td>
                         <div className="d-flex gap-2">
-                          <Link to={`/editar/${p.ID_PARTIDA}`} className="btn btn-sm btn-primary">
+                          <Link to={`/editar/${p.ID_PARTIDA}`} className="btn btn-outline-secondary btn-sm">
                             Editar
                           </Link>
-                          <button className="btn btn-sm btn-danger" onClick={() => handleEliminar(p.ID_PARTIDA)}>
+                          <button className="btn btn-outline-danger btn-sm" onClick={() => handleEliminar(p.ID_PARTIDA)}>
                             Eliminar
                           </button>
                         </div>
